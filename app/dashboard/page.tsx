@@ -27,7 +27,7 @@ export default function Dashboard() {
   };
 
   const addProject = () => {
-    setProjects((prev) => [...prev, { key: "", teamName: "" }]);
+    setProjects((prev) => [...prev, { boardId: "", teamName: "" }]);
   };
 
   const removeProject = (index: number) => {
@@ -132,7 +132,7 @@ export default function Dashboard() {
                     </label>
                     <input
                       type="text"
-                      value={project.key}
+                      value={project.boardId}
                       onChange={(e) => updateProject(index, "boardId", e.target.value.toUpperCase())}
                       placeholder="ex: 505"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
