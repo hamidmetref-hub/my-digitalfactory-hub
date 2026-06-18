@@ -5,7 +5,7 @@ import { useState } from "react";
 const PROJECTS = [
   { boardId: "344",  teamName: "Skroll Team",  color: "blue" },
   { boardId: "505",  teamName: "Core Team",    color: "green" },
-  { boardId: "1865", teamName: "Eproc Team",   color: "orange" },
+  { boardId: "341", teamName: "Eproc Team",   color: "orange" },
   { boardId: "974",  teamName: "Next Team",    color: "purple" },
 ];
 
