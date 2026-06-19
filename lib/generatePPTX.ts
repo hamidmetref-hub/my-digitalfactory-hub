@@ -39,7 +39,8 @@ function buildSlide(
   teamName: string,
   col1: ColData,
   col2: ColData,
-  col3: ColData
+  col3: ColData,
+  releases: { id?: string; date?: string }[]
 ) {
   const slide = pres.addSlide();
   slide.background = { color: BG };
@@ -64,10 +65,17 @@ function buildSlide(
   });
 
   // ── Column headers ──
+  const buildSub = (base: string, rel: { id?: string; date?: string }) => {
+    const parts = [base];
+    if (rel.id) parts.push(`Rel. ${rel.id}`);
+    if (rel.date) parts.push(rel.date);
+    return parts.join("  ·  ");
+  };
+
   const cols = [
-    { x: COL1_X, label: "Ce qu'on livre",  sub: "Sprint terminé",     acc: COL1_ACC, bg: COL1_BG },
-    { x: COL2_X, label: "Sprint en cours", sub: "En cours",           acc: COL2_ACC, bg: COL2_BG },
-    { x: COL3_X, label: "Sprint +1",       sub: "À venir",            acc: COL3_ACC, bg: COL3_BG },
+    { x: COL1_X, label: "Ce qu'on livre",  sub: buildSub("Sprint terminé", releases[0] || {}), acc: COL1_ACC, bg: COL1_BG },
+    { x: COL2_X, label: "Sprint en cours", sub: buildSub("En cours", releases[1] || {}),        acc: COL2_ACC, bg: COL2_BG },
+    { x: COL3_X, label: "Sprint +1",       sub: buildSub("À venir", releases[2] || {}),         acc: COL3_ACC, bg: COL3_BG },
   ];
 
   for (const c of cols) {
@@ -114,11 +122,13 @@ function buildSlide(
   });
   y += 0.15;
 
-  for (let i = 0; i < col1.items.length; i++) {
-    const item = col1.items[i] as SprintItem;
-    slide.addText(`${i + 1}.  ${item.title}`, {
+  const col1Items = col1.items.slice(0, 4);
+  for (let i = 0; i < col1Items.length; i++) {
+    const item = col1Items[i] as SprintItem;
+    const title = item.title.length > 65 ? item.title.substring(0, 62) + "..." : item.title;
+    slide.addText(`${i + 1}.  ${title}`, {
       x: COL1_X + 0.15, y, w: COL_W - 0.3, h: 0.32,
-      fontSize: 9.5, fontFace: "Calibri", bold: true, color: TEXT_DARK,
+      fontSize: 9, fontFace: "Calibri", bold: true, color: TEXT_DARK,
     });
     y += 0.32;
     if (item.tag) {
@@ -163,16 +173,17 @@ function buildSlide(
   });
   y += 0.15;
 
-  for (const item of col2.items as string[]) {
+  for (const item of (col2.items as string[]).slice(0, 5)) {
+    const txt2 = item.length > 65 ? item.substring(0, 62) + "..." : item;
     slide.addShape(pres.ShapeType.ellipse, {
       x: COL2_X + 0.15, y: y + 0.06, w: 0.1, h: 0.1,
       fill: { color: COL2_ACC }, line: { color: COL2_ACC },
     });
-    slide.addText(item, {
-      x: COL2_X + 0.32, y, w: COL_W - 0.47, h: 0.22,
-      fontSize: 9, fontFace: "Calibri", color: TEXT_MED,
+    slide.addText(txt2, {
+      x: COL2_X + 0.32, y, w: COL_W - 0.47, h: 0.28,
+      fontSize: 8.5, fontFace: "Calibri", color: TEXT_MED,
     });
-    y += 0.26;
+    y += 0.3;
   }
 
   // ── Col 3 — Sprint +1 ──
@@ -195,14 +206,15 @@ function buildSlide(
   });
   y += 0.15;
 
-  for (const item of col3.items as string[]) {
+  for (const item of (col3.items as string[]).slice(0, 5)) {
+    const txt3 = item.length > 65 ? item.substring(0, 62) + "..." : item;
     slide.addShape(pres.ShapeType.ellipse, {
       x: COL3_X + 0.15, y: y + 0.06, w: 0.1, h: 0.1,
       fill: { color: COL3_ACC }, line: { color: COL3_ACC },
     });
-    slide.addText(item, {
-      x: COL3_X + 0.32, y, w: COL_W - 0.47, h: 0.22,
-      fontSize: 9, fontFace: "Calibri", color: TEXT_MED,
+    slide.addText(txt3, {
+      x: COL3_X + 0.32, y, w: COL_W - 0.47, h: 0.28,
+      fontSize: 8.5, fontFace: "Calibri", color: TEXT_MED,
     });
     y += 0.26;
   }
@@ -219,6 +231,12 @@ function buildSlide(
 
 export interface ProjectSprintData {
   teamName: string;
+  completedReleaseId?: string;
+  completedReleaseDate?: string;
+  activeReleaseId?: string;
+  activeReleaseDate?: string;
+  futureReleaseId?: string;
+  futureReleaseDate?: string;
   completedGoal: string;
   completedItems: SprintItem[];
   activeGoal: string;
@@ -238,7 +256,12 @@ export async function generatePPTX(projects: ProjectSprintData[]): Promise<strin
       p.teamName,
       { goal: p.completedGoal, items: p.completedItems },
       { goal: p.activeGoal,    items: p.activeItems },
-      { goal: p.futureGoal,    items: p.futureItems }
+      { goal: p.futureGoal,    items: p.futureItems },
+      [
+        { id: p.completedReleaseId, date: p.completedReleaseDate },
+        { id: p.activeReleaseId, date: p.activeReleaseDate },
+        { id: p.futureReleaseId, date: p.futureReleaseDate },
+      ]
     );
   }
 
