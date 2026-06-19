@@ -53,10 +53,10 @@ function nextMonday(dateStr: string | undefined): string | undefined {
   if (!dateStr) return undefined;
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return undefined;
-  const day = d.getDay(); // 0 = Sunday, 1 = Monday...
+  const day = d.getUTCDay(); // 0 = Sunday, 1 = Monday... en UTC pour eviter les decalages timezone
   const diff = day === 1 ? 0 : (8 - day) % 7 || 7;
-  d.setDate(d.getDate() + diff);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+  d.setUTCDate(d.getUTCDate() + diff);
+  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
 }
 
 export async function POST(req: NextRequest) {
