@@ -77,7 +77,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       boardId,
-      activeSprint: activeSprint ? { id: activeSprint.id, name: activeSprint.name, goal: activeSprint.goal || "" } : null,
+      activeSprint: activeSprint ? { id: activeSprint.id, name: activeSprint.name, goal: activeSprint.goal || "", endDate: activeSprint.endDate, startDate: activeSprint.startDate } : null,
       lastClosedSprint: lastClosed ? { id: lastClosed.id, name: lastClosed.name, goal: lastClosed.goal || "" } : null,
       futureSprint: futureSprint ? { id: futureSprint.id, name: futureSprint.name, goal: futureSprint.goal || "" } : null,
       completedIssues: completedIssues.map((i: any) => ({ key: i.key, summary: i.fields.summary })),

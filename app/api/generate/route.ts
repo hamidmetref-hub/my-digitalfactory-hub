@@ -53,10 +53,15 @@ function nextMonday(dateStr: string | undefined): string | undefined {
   if (!dateStr) return undefined;
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return undefined;
-  const day = d.getUTCDay(); // 0 = Sunday, 1 = Monday... en UTC pour eviter les decalages timezone
+
+  // Convertit en heure de Paris pour determiner le bon jour de la semaine
+  const parisDateStr = d.toLocaleString("en-US", { timeZone: "Europe/Paris" });
+  const parisDate = new Date(parisDateStr);
+  const day = parisDate.getDay(); // 0 = Sunday, 1 = Monday...
   const diff = day === 1 ? 0 : (8 - day) % 7 || 7;
-  d.setUTCDate(d.getUTCDate() + diff);
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" });
+  parisDate.setDate(parisDate.getDate() + diff);
+
+  return parisDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
 }
 
 export async function POST(req: NextRequest) {
